@@ -33,7 +33,7 @@ RFC 8018 provides comprehensive guidelines on the implementation and usage of PB
 
 ```dart
 import 'dart:typed_data';
-import 'package:your_package/pbkdf2.dart';
+import 'package:pbkdf2/pbkdf2.dart';
 
 Uint8List password = ...; // User-provided password
 Uint8List salt = ...; // A unique salt
