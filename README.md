@@ -27,25 +27,6 @@ RFC 8018 provides comprehensive guidelines on the implementation and usage of PB
 
 ## Usage Examples
 
-### Real-World Use Case: Secure Password Storage
-
-**Scenario**: Deriving a cryptographic key from a user's password for secure password storage.
-
-```dart
-import 'dart:typed_data';
-import 'package:pbkdf2/pbkdf2.dart';
-
-Uint8List password = ...; // User-provided password
-Uint8List salt = ...; // A unique salt
-int iterations = ...; // Recommended iteration count
-int length = ...; // Desired key length
-
-// Derive key
-Uint8List derivedKey = PBKDF2.deriveKey(password, salt, iterations, length);
-
-// Use derivedKey for secure storage
-```
-
 ### Real-World Use Case: Key Generation for Encryption
 
 **Scenario**: Generating a strong encryption key from a passphrase.
