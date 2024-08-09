@@ -26,60 +26,38 @@ abstract class PBKDF2 {
     final int hashLen = hash.convert(<int>[]).bytes.length;
 
     if (length > ((2 ^ 32) - 1) * hashLen) {
-      throw ArgumentError('Requested derived key too long');
+      throw ArgumentError('Requested derived key too long.');
     }
 
-    final int l = (length / hashLen).ceil();
     final Hmac prf = Hmac(hash, password);
-    final Uint8List buffer = Uint8List(hashLen);
-    final Uint8List result = Uint8List(length);
+    final Uint8List si = Uint8List(salt.length + 4)..setAll(0, salt);
+    final Uint8List u = Uint8List(hashLen), result = Uint8List(length);
 
     int offset = 0;
-    for (int i = 1; i <= l; i++) {
-      final Uint8List block = _f(salt, iterations, i, prf, buffer);
+    final int blocks = length ~/ hashLen;
+    for (int i = 1; i <= blocks; ++i, offset += hashLen) {
+      si.buffer.asByteData(salt.length).setUint32(0, i);
+      result.setAll(offset, u..setAll(0, prf.convert(si).bytes));
+      for (int j = 1; j < iterations; ++j) {
+        u.setAll(0, prf.convert(u).bytes);
+        for (int k = 0; k < hashLen; ++k) {
+          result[offset + k] ^= u[k];
+        }
+      }
+    }
 
-      final int blockSize = (i == l) ? length - offset : hashLen;
-      result.setRange(offset, offset + blockSize, block);
-      offset += blockSize;
+    final int remainder = length % hashLen;
+    if (remainder > 0) {
+      si.buffer.asByteData(salt.length).setUint32(0, blocks + 1);
+      result.setRange(offset, length, u..setAll(0, prf.convert(si).bytes));
+      for (int j = 1; j < iterations; ++j) {
+        u.setAll(0, prf.convert(u).bytes);
+        for (int k = 0; k < remainder; ++k) {
+          result[offset + k] ^= u[k];
+        }
+      }
     }
 
     return result;
   }
-}
-
-/// Internal function to calculate the T_i blocks in the PBKDF2 function.
-///
-/// It takes the salt, iteration count, index, pseudorandom function (PRF), and a buffer.
-/// For each block, it applies the PRF to the concatenated salt and index and then XORs the result
-/// over the specified number of iterations. The resulting value is used in the derivation of the final key.
-Uint8List _f(
-  Uint8List salt,
-  int iterations,
-  int index,
-  Hmac prf,
-  Uint8List buffer,
-) {
-  List<int> u = prf.convert(salt + _intToBigEndian(index)).bytes;
-  for (int i = 0; i < buffer.length; i++) {
-    buffer[i] = u[i];
-  }
-
-  for (int i = 1; i < iterations; i++) {
-    u = prf.convert(u).bytes;
-    for (int j = 0; j < buffer.length; j++) {
-      buffer[j] ^= u[j];
-    }
-  }
-
-  return buffer;
-}
-
-/// Converts an integer to its big-endian representation.
-///
-/// This is used to convert the block index to a big-endian format as required by the PBKDF2 specification.
-/// The function takes an integer and returns a Uint8List representing the integer in big-endian byte order.
-Uint8List _intToBigEndian(int i) {
-  final ByteData bytes = ByteData(4);
-  bytes.setUint32(0, i, Endian.big);
-  return bytes.buffer.asUint8List();
 }
