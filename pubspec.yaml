@@ -1,12 +1,13 @@
 name: pbkdf2
 description: An implementation of the Password-Based Key Derivation Function 2 (PBKDF2) mechanism. (RFC 8018)
-version: 1.0.1
-# repository: https://github.com/carlosmakin/pbkdf2
+version: 1.0.2
+repository: https://github.com/carlosmakin/pbkdf2
 
 environment:
   sdk: ^3.3.0
 
 dependencies:
+  benchmark_harness: ^2.2.2
   crypto: ^3.0.3
 
 dev_dependencies:
