@@ -33,9 +33,8 @@ abstract class PBKDF2 {
     final Uint8List si = Uint8List(salt.length + 4)..setAll(0, salt);
     final Uint8List u = Uint8List(hashLen), result = Uint8List(length);
 
-    int offset = 0;
     final int blocks = length ~/ hashLen;
-    for (int i = 1; i <= blocks; ++i, offset += hashLen) {
+    for (int i = 1, offset = 0; i <= blocks; ++i, offset += hashLen) {
       si.buffer.asByteData(salt.length).setUint32(0, i);
       result.setAll(offset, u..setAll(0, prf.convert(si).bytes));
       for (int j = 1; j < iterations; ++j) {
@@ -48,6 +47,7 @@ abstract class PBKDF2 {
 
     final int remainder = length % hashLen;
     if (remainder > 0) {
+      final int offset = length - remainder;
       si.buffer.asByteData(salt.length).setUint32(0, blocks + 1);
       result.setRange(offset, length, u..setAll(0, prf.convert(si).bytes));
       for (int j = 1; j < iterations; ++j) {
