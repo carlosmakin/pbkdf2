@@ -20,7 +20,13 @@ void main() {
 
         final Uint8List expected = parseBlockHexString(testVector['key'])!;
 
-        final Uint8List key = PBKDF2.deriveKey(password, salt, iterations, length, hash);
+        final Uint8List key = PBKDF2.deriveKey(
+          password,
+          salt,
+          iterations,
+          length,
+          hash,
+        );
 
         expect(key, equals(expected));
       });

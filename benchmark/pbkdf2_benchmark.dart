@@ -3,7 +3,7 @@ import 'package:pbkdf2/export.dart';
 
 import 'benchmark.dart';
 
-class PBKDF2Benchmark extends BenchmarkBase {
+final class PBKDF2Benchmark extends BenchmarkBase {
   const PBKDF2Benchmark() : super('pbkdf2', emitter: emitter);
 
   static void main() => PBKDF2Benchmark().report();

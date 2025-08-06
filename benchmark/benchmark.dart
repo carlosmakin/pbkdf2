@@ -17,7 +17,7 @@ final Uint8List salt = Uint8List.fromList('salt'.codeUnits);
 
 const BenchmarkEmitter emitter = BenchmarkEmitter();
 
-class BenchmarkEmitter implements ScoreEmitter {
+final class BenchmarkEmitter implements ScoreEmitter {
   const BenchmarkEmitter();
 
   @override
